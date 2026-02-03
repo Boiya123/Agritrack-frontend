@@ -21,7 +21,7 @@ What must NOT go here:
 - Vaccination and lifecycle data
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from uuid import UUID
 
@@ -30,17 +30,47 @@ from app.api.routes.auth_routes import get_current_user
 from app.models.user_model import User, UserRole
 from app.models.domain_models import Product
 from app.schemas.domain_schemas import ProductCreate, ProductUpdate, ProductResponse
+from app.services.blockchain_service import SupplyChainContractHelper
+from app.services.blockchain_tasks import write_batch_to_blockchain
 
 router = APIRouter(prefix="/products", tags=["products"])
+
+
+async def _create_product_blockchain(product_id: str, product_name: str):
+    """Background task: Create product on blockchain"""
+    try:
+        helper = SupplyChainContractHelper()
+        await helper.create_product(
+            product_id=product_id,
+            product_name=product_name,
+            product_type=product_name
+        )
+    except Exception as e:
+        logger.error(f"Failed to create product {product_id} on blockchain: {e}")
+
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 @router.post("", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
 async def create_product(
     product_data: ProductCreate,
     current_user: User = Depends(get_current_user),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: Session = Depends(get_db)
 ):
-    """Create a new product type (admin only)"""
+    """Create a new product type (admin only)
+
+    Product types represent agricultural products that can be tracked:
+    - Poultry (chicken, duck, turkey)
+    - Crops (rice, corn, wheat)
+    - Aquaculture (fish, shrimp)
+    - Livestock (cattle, goats)
+
+    Blockchain: Product creation is synced to Hyperledger Fabric for
+    product registry transparency and traceability.
+    """
     if current_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -64,6 +94,13 @@ async def create_product(
     db.add(product)
     db.commit()
     db.refresh(product)
+
+    # Queue blockchain write in background (non-blocking)
+    background_tasks.add_task(
+        _create_product_blockchain,
+        product_id=str(product.id),
+        product_name=product.name
+    )
 
     return product
 

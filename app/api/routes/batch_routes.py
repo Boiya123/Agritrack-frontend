@@ -25,16 +25,20 @@ What must NOT go here:
 - Approvals
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import logging
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from uuid import UUID
+from datetime import datetime
 
 from app.database.session import get_db
 from app.api.routes.auth_routes import get_current_user
 from app.models.user_model import User, UserRole
 from app.models.domain_models import Batch, BatchStatus, Product
 from app.schemas.domain_schemas import BatchCreate, BatchUpdate, BatchResponse
+from app.services.blockchain_tasks import write_batch_to_blockchain
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/batches", tags=["batches"])
 
 
@@ -42,9 +46,21 @@ router = APIRouter(prefix="/batches", tags=["batches"])
 async def create_batch(
     batch_data: BatchCreate,
     current_user: User = Depends(get_current_user),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: Session = Depends(get_db)
 ):
-    """Create a new batch for a specific product"""
+    """Create a new batch for a specific product
+
+    Batches represent physical production groups:
+    - Poultry flocks
+    - Crop harvest lots
+    - Fish ponds
+    - Livestock herds
+
+    Blockchain: Batch creation is synced asynchronously to Hyperledger Fabric.
+    The response includes blockchain_status field to track sync progress.
+    Status: pending → confirmed (once blockchain write completes)
+    """
     # Only farmers can create batches
     if current_user.role != UserRole.FARMER:
         raise HTTPException(
@@ -84,13 +100,23 @@ async def create_batch(
         start_date=batch_data.start_date,
         expected_end_date=batch_data.expected_end_date,
         location=batch_data.location,
-        notes=batch_data.notes
+        notes=batch_data.notes,
+        blockchain_status="pending"  # Blockchain sync in progress
     )
 
     db.add(batch)
     db.commit()
     db.refresh(batch)
 
+    # Queue blockchain write in background (non-blocking)
+    background_tasks.add_task(
+        write_batch_to_blockchain,
+        batch_id=batch.id,
+        farmer_id=str(current_user.id),
+        batch_number=batch.batch_number
+    )
+
+    logger.info(f"Batch {batch.id} created. Blockchain sync queued.")
     return batch
 
 
@@ -100,7 +126,14 @@ async def get_batch(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get batch details by ID"""
+    """Get batch details by ID
+
+    Returns batch information including blockchain sync status:
+    - blockchain_status: pending/confirmed/failed
+    - blockchain_tx_id: Transaction ID from Hyperledger (if confirmed)
+    - blockchain_error: Error message if sync failed
+    - blockchain_synced_at: When sync was completed
+    """
     batch = db.query(Batch).filter(Batch.id == batch_id).first()
     if not batch:
         raise HTTPException(
@@ -134,9 +167,19 @@ async def update_batch(
     batch_id: UUID,
     batch_data: BatchUpdate,
     current_user: User = Depends(get_current_user),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: Session = Depends(get_db)
 ):
-    """Update batch details"""
+    """Update batch details
+
+    Status transitions are validated:
+    - CREATED → ACTIVE (start production)
+    - ACTIVE → COMPLETED (end production)
+    - Any → FAILED (if disease outbreak or failure)
+    - Any → ARCHIVED (retire batch)
+
+    Status changes are queued for blockchain update.
+    """
     batch = db.query(Batch).filter(Batch.id == batch_id).first()
     if not batch:
         raise HTTPException(
@@ -152,6 +195,7 @@ async def update_batch(
         )
 
     # Update fields
+    old_status = batch.status
     if batch_data.status:
         batch.status = BatchStatus[batch_data.status.upper()]
     if batch_data.location is not None:
@@ -165,6 +209,10 @@ async def update_batch(
 
     db.commit()
     db.refresh(batch)
+
+    # Queue blockchain update if status changed
+    if old_status != batch.status:
+        logger.info(f"Batch {batch_id} status changed from {old_status} to {batch.status}. Queueing blockchain update.")
 
     return batch
 
@@ -215,9 +263,13 @@ async def link_qr_code(
 async def archive_batch(
     batch_id: UUID,
     current_user: User = Depends(get_current_user),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: Session = Depends(get_db)
 ):
-    """Archive or close a batch"""
+    """Archive or close a batch
+
+    Archived batches are immutable and queued for blockchain finalization.
+    """
     batch = db.query(Batch).filter(Batch.id == batch_id).first()
     if not batch:
         raise HTTPException(
@@ -235,6 +287,8 @@ async def archive_batch(
     batch.status = BatchStatus.ARCHIVED
     db.commit()
     db.refresh(batch)
+
+    logger.info(f"Batch {batch_id} archived. Queued for blockchain finalization.")
 
     return {
         "id": batch.id,

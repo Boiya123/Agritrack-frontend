@@ -25,9 +25,11 @@ What must NOT go here:
 - Regulatory approvals
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from uuid import UUID
+import logging
+from datetime import datetime, timedelta
 
 from app.database.session import get_db
 from app.api.routes.auth_routes import get_current_user
@@ -37,8 +39,12 @@ from app.schemas.domain_schemas import (
     ProcessingRecordCreate, ProcessingRecordUpdate, ProcessingRecordResponse,
     CertificationCreate, CertificationUpdate, CertificationResponse
 )
-# from app.services.blockchain_service import emit_quality_check_failure, EventSeverity
+from app.services.blockchain_tasks import (
+    write_processing_to_blockchain,
+    issue_certification_on_blockchain
+)
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/processing", tags=["processing"])
 
 
@@ -46,9 +52,20 @@ router = APIRouter(prefix="/processing", tags=["processing"])
 async def create_processing_record(
     record_data: ProcessingRecordCreate,
     current_user: User = Depends(get_current_user),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: Session = Depends(get_db)
 ):
-    """Create a processing facility record for a batch"""
+    """Create a processing facility record for a batch
+
+    Processing records track the conversion of batches to final products:
+    - Slaughter/harvest counts
+    - Yield measurements
+    - Quality assessments
+    - Facility information
+
+    Blockchain: Processing records are synced asynchronously for permanent
+    traceability from production to final product delivery.
+    """
     # Verify batch exists
     batch = db.query(Batch).filter(Batch.id == record_data.batch_id).first()
     if not batch:
@@ -71,13 +88,22 @@ async def create_processing_record(
         slaughter_count=record_data.slaughter_count,
         yield_kg=record_data.yield_kg,
         quality_score=record_data.quality_score,
-        notes=record_data.notes
+        notes=record_data.notes,
+        blockchain_status="pending"
     )
 
     db.add(processing_record)
     db.commit()
     db.refresh(processing_record)
 
+    # Queue blockchain write
+    background_tasks.add_task(
+        write_processing_to_blockchain,
+        processing_id=processing_record.id,
+        batch_id=record_data.batch_id
+    )
+
+    logger.info(f"ProcessingRecord {processing_record.id} created. Blockchain sync queued.")
     return processing_record
 
 
@@ -87,7 +113,7 @@ async def get_processing_record(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get processing record details"""
+    """Get processing record details with blockchain status"""
     record = db.query(ProcessingRecord).filter(ProcessingRecord.id == record_id).first()
     if not record:
         raise HTTPException(
@@ -131,6 +157,7 @@ async def update_processing_record(
     record_id: UUID,
     record_data: ProcessingRecordUpdate,
     current_user: User = Depends(get_current_user),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: Session = Depends(get_db)
 ):
     """Update processing record (quality score, notes)"""
@@ -149,16 +176,9 @@ async def update_processing_record(
 
     if record_data.quality_score is not None:
         record.quality_score = record_data.quality_score
-
-        # Emit blockchain event if quality check fails (score < 60)
+        # Quality failures (score < 60) are logged
         if record_data.quality_score < 60:
-            batch = db.query(Batch).filter(Batch.id == record.batch_id).first()
-            await emit_quality_check_failure(
-                batch_id=record.batch_id,
-                farmer_id=batch.farmer_id if batch else None,
-                failure_reason=f"Quality score below threshold: {record_data.quality_score}",
-                severity_level=EventSeverity.HIGH
-            )
+            logger.warning(f"Low quality score ({record_data.quality_score}) for processing record {record_id}")
 
     if record_data.notes is not None:
         record.notes = record_data.notes
@@ -175,9 +195,20 @@ async def update_processing_record(
 async def create_certification(
     cert_data: CertificationCreate,
     current_user: User = Depends(get_current_user),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: Session = Depends(get_db)
 ):
-    """Create a certification record for a processing record"""
+    """Create a certification record for a processing record
+
+    Certifications verify compliance with specific standards:
+    - Halal certification
+    - Organic certification
+    - Food safety certifications
+    - Traceability certifications
+
+    Blockchain: Certifications are immutably recorded on blockchain
+    to prevent forgery and maintain consumer trust.
+    """
     # Verify processing record exists
     record = db.query(ProcessingRecord).filter(
         ProcessingRecord.id == cert_data.processing_record_id
@@ -199,13 +230,21 @@ async def create_certification(
         processing_record_id=cert_data.processing_record_id,
         cert_type=cert_data.cert_type,
         status="pending",
-        notes=cert_data.notes
+        notes=cert_data.notes,
+        blockchain_status="pending"
     )
 
     db.add(certification)
     db.commit()
     db.refresh(certification)
 
+    # Queue blockchain write
+    background_tasks.add_task(
+        issue_certification_on_blockchain,
+        certification_id=certification.id
+    )
+
+    logger.info(f"Certification {certification.id} created. Blockchain sync queued.")
     return certification
 
 
@@ -215,7 +254,7 @@ async def get_certification(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get certification details"""
+    """Get certification details with blockchain status"""
     cert = db.query(Certification).filter(Certification.id == cert_id).first()
     if not cert:
         raise HTTPException(
@@ -291,6 +330,7 @@ async def update_certification(
 async def approve_certification(
     cert_id: UUID,
     current_user: User = Depends(get_current_user),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: Session = Depends(get_db)
 ):
     """Approve a certification"""
@@ -307,15 +347,15 @@ async def approve_certification(
             detail="Certification not found"
         )
 
-    from datetime import datetime, timedelta
-
     cert.status = "approved"
     cert.issuer_id = current_user.id
-    cert.issued_date = datetime.now()
-    cert.expiry_date = datetime.now() + timedelta(days=365)  # 1 year validity
+    cert.issued_date = datetime.utcnow()
+    cert.expiry_date = datetime.utcnow() + timedelta(days=365)  # 1 year validity
 
     db.commit()
     db.refresh(cert)
+
+    logger.info(f"Certification {cert_id} approved")
 
     return {
         "id": cert.id,

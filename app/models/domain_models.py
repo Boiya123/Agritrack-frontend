@@ -45,6 +45,11 @@ class Batch(Base):
     location = Column(String, nullable=True)  # Farm location/house
     qr_code = Column(String, unique=True, nullable=True)  # QR system link
     notes = Column(String, nullable=True)
+    # Blockchain integration fields
+    blockchain_tx_id = Column(String, nullable=True, index=True)  # Transaction ID from Hyperledger
+    blockchain_status = Column(String, default="pending")  # pending, confirmed, failed, pending_retry
+    blockchain_error = Column(String, nullable=True)  # Error message if blockchain write failed
+    blockchain_synced_at = Column(DateTime(timezone=True), nullable=True)  # When sync completed
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -74,6 +79,10 @@ class LifecycleEvent(Base):
     event_date = Column(DateTime(timezone=True), nullable=False)
     quantity_affected = Column(Integer, nullable=True)  # For mortality, hatch, etc.
     event_metadata = Column(String, nullable=True)  # JSON field for additional details
+    # Blockchain integration fields
+    blockchain_tx_id = Column(String, nullable=True, index=True)  # Append-only on blockchain
+    blockchain_status = Column(String, default="pending")  # pending, confirmed, failed, pending_retry
+    blockchain_error = Column(String, nullable=True)  # Error message if write failed
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -98,6 +107,12 @@ class Transport(Base):
     temperature_monitored = Column(Boolean, default=False)
     status = Column(String, default="in_transit")  # in_transit, arrived, completed
     notes = Column(String, nullable=True)
+    # Blockchain integration fields
+    blockchain_tx_id = Column(String, nullable=True, index=True)
+    blockchain_status = Column(String, default="pending")  # pending, confirmed, failed, pending_retry
+    blockchain_error = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -133,6 +148,10 @@ class ProcessingRecord(Base):
     yield_kg = Column(Float, nullable=True)
     quality_score = Column(Float, nullable=True)  # 0-100
     notes = Column(String, nullable=True)
+    # Blockchain integration fields
+    blockchain_tx_id = Column(String, nullable=True, index=True)
+    blockchain_status = Column(String, default="pending")  # pending, confirmed, failed, pending_retry
+    blockchain_error = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -152,6 +171,10 @@ class Certification(Base):
     expiry_date = Column(DateTime(timezone=True), nullable=True)
     issuer_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     notes = Column(String, nullable=True)
+    # Blockchain integration fields
+    blockchain_tx_id = Column(String, nullable=True, index=True)
+    blockchain_status = Column(String, default="pending")  # pending, confirmed, failed, pending_retry
+    blockchain_error = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -173,6 +196,10 @@ class RegulatoryRecord(Base):
     details = Column(String, nullable=True)  # JSON or text with regulatory details
     rejection_reason = Column(String, nullable=True)
     audit_flags = Column(String, nullable=True)  # JSON array of flags
+    # Blockchain integration fields
+    blockchain_tx_id = Column(String, nullable=True, index=True)
+    blockchain_status = Column(String, default="pending")  # pending, confirmed, failed, pending_retry
+    blockchain_error = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

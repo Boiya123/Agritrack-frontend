@@ -25,9 +25,12 @@ What must NOT go here:
 - Processing
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import logging
+import json
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from uuid import UUID
+from datetime import datetime, timedelta
 
 from app.database.session import get_db
 from app.api.routes.auth_routes import get_current_user
@@ -36,12 +39,9 @@ from app.models.domain_models import RegulatoryRecord, Batch
 from app.schemas.domain_schemas import (
     RegulatoryRecordCreate, RegulatoryRecordUpdate, RegulatoryRecordResponse
 )
-# from app.services.blockchain_service import (
-#     emit_certification_failed,
-#     emit_regulatory_violation,
-#     EventSeverity
-# )
+from app.services.blockchain_tasks import write_regulatory_record_to_blockchain
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/regulatory", tags=["regulatory"])
 
 
@@ -49,9 +49,21 @@ router = APIRouter(prefix="/regulatory", tags=["regulatory"])
 async def create_regulatory_record(
     record_data: RegulatoryRecordCreate,
     current_user: User = Depends(get_current_user),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: Session = Depends(get_db)
 ):
-    """Create a regulatory record (health cert, export permit, etc.)"""
+    """Create a regulatory record (health cert, export permit, etc.)
+
+    Regulatory records represent official approvals/permits:
+    - Health certificates
+    - Export permits
+    - Compliance checks
+    - Audit records
+
+    Blockchain: Regulatory decisions are immutably recorded for
+    farmer compliance transparency and regulatory audit trails.
+    Rejections and violations are permanent public record.
+    """
     # Only regulators and admins can create regulatory records
     if current_user.role not in [UserRole.REGULATOR, UserRole.ADMIN]:
         raise HTTPException(
@@ -72,13 +84,22 @@ async def create_regulatory_record(
         record_type=record_data.record_type,
         status="pending",
         regulator_id=current_user.id,
-        details=record_data.details
+        details=record_data.details,
+        blockchain_status="pending"
     )
 
     db.add(record)
     db.commit()
     db.refresh(record)
 
+    # Queue blockchain write
+    background_tasks.add_task(
+        write_regulatory_record_to_blockchain,
+        regulatory_id=record.id,
+        batch_id=record_data.batch_id
+    )
+
+    logger.info(f"RegulatoryRecord {record.id} created. Blockchain sync queued.")
     return record
 
 
@@ -88,7 +109,7 @@ async def get_regulatory_record(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get regulatory record details"""
+    """Get regulatory record details with blockchain status"""
     record = db.query(RegulatoryRecord).filter(RegulatoryRecord.id == record_id).first()
     if not record:
         raise HTTPException(
@@ -180,6 +201,7 @@ async def update_regulatory_record(
 async def approve_regulatory_record(
     record_id: UUID,
     current_user: User = Depends(get_current_user),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: Session = Depends(get_db)
 ):
     """Approve a regulatory record"""
@@ -196,19 +218,19 @@ async def approve_regulatory_record(
             detail="Regulatory record not found"
         )
 
-    from datetime import datetime, timedelta
-
     record.status = "approved"
-    record.issued_date = datetime.now()
+    record.issued_date = datetime.utcnow()
 
     # Set expiry based on record type
     if "cert" in record.record_type.lower():
-        record.expiry_date = datetime.now() + timedelta(days=365)
+        record.expiry_date = datetime.utcnow() + timedelta(days=365)
     elif "permit" in record.record_type.lower():
-        record.expiry_date = datetime.now() + timedelta(days=30)
+        record.expiry_date = datetime.utcnow() + timedelta(days=30)
 
     db.commit()
     db.refresh(record)
+
+    logger.info(f"RegulatoryRecord {record_id} approved")
 
     return {
         "id": record.id,
