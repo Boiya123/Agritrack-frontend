@@ -1,0 +1,69 @@
+.poultry-display{
+    margin-top: 30px;
+    padding-bottom: 40px;
+}
+
+.food-display h2{
+    font-size: max(2vw, 24px);
+    font-weight: 600;
+}
+
+.food-display-list{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    margin-top: 30px;
+    gap: 30px;
+    row-gap: 50px;
+}
+
+@media (max-width: 1024px) {
+    .poultry-display{
+        margin-top: 25px;
+        padding-bottom: 30px;
+    }
+    
+    .food-display h2{
+        font-size: max(1.8vw, 22px);
+    }
+    
+    .food-display-list{
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 25px;
+        row-gap: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .poultry-display{
+        margin-top: 20px;
+        padding-bottom: 25px;
+    }
+    
+    .food-display h2{
+        font-size: 20px;
+    }
+    
+    .food-display-list{
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 20px;
+        row-gap: 35px;
+    }
+}
+
+@media (max-width: 480px) {
+    .poultry-display{
+        margin-top: 15px;
+        padding-bottom: 20px;
+    }
+    
+    .food-display h2{
+        font-size: 18px;
+    }
+    
+    .food-display-list{
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+        row-gap: 25px;
+    }
+}
+

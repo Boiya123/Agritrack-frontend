@@ -1,0 +1,126 @@
+.header{
+    height: 34vw;
+    margin: 30px auto;
+    background: url('/header.jpg') no-repeat;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    border-radius: 11px;
+}
+
+.header-contents{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 1.5vw;
+    max-width: 50%;
+    bottom: 10%;
+    left: 6vw;
+    color: white;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+.header-contents h2{
+    font-size: max(4.5vw, 22px);
+    font-weight: 500;
+}
+
+.header-contents button{
+    border: none;
+    color: #747474;
+    font-weight: 500;
+    padding: 12px 30px;
+    background-color: white;
+    font-size: 16px;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1024px) {
+    .header{
+        height: 40vw;
+        margin: 20px auto;
+    }
+    
+    .header-contents{
+        max-width: 60%;
+        gap: 1.2vw;
+        bottom: 8%;
+        left: 4vw;
+    }
+    
+    .header-contents h2{
+        font-size: max(3.5vw, 18px);
+    }
+    
+    .header-contents button{
+        padding: 10px 25px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header{
+        height: 50vw;
+        margin: 15px auto;
+        border-radius: 8px;
+    }
+    
+    .header-contents{
+        max-width: 75%;
+        gap: 1vw;
+        bottom: 5%;
+        left: 3vw;
+    }
+    
+    .header-contents h2{
+        font-size: max(3vw, 16px);
+    }
+    
+    .header-contents p{
+        font-size: 12px;
+    }
+    
+    .header-contents button{
+        padding: 8px 20px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header{
+        height: 55vw;
+        margin: 10px auto;
+        border-radius: 6px;
+    }
+    
+    .header-contents{
+        max-width: 85%;
+        gap: 0.8vw;
+        bottom: 3%;
+        left: 2vw;
+    }
+    
+    .header-contents h2{
+        font-size: 14px;
+    }
+    
+    .header-contents p{
+        font-size: 10px;
+    }
+    
+    .header-contents button{
+        padding: 6px 16px;
+        font-size: 11px;
+    }
+}
