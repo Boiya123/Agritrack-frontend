@@ -7,6 +7,7 @@ import AddProduct from './pages/AddProduct/AddProduct'
 import Operations from './pages/Operations/Operations'
 import Dashboard from './pages/Dashboard/Dashboard'
 import RegulatoryDashboard from './pages/Dashboard/RegulatoryDashboard'
+import ProductBatches from './pages/ProductBatches/ProductBatches'
 import AccountSettings from './pages/AccountSettings/AccountSettings'
 import ProductManagement from './pages/ProductManagement/ProductManagement'
 import BatchDetail from './pages/BatchDetail/BatchDetail'
@@ -40,6 +41,7 @@ const App = () => {
           <Route path='/ops' element={<Operations />} />
           <Route path='/dashboard' element={<Dashboard />} />
           <Route path='/regulatory' element={<RegulatoryDashboard />} />
+          <Route path='/product-batches/:productId' element={<ProductBatches />} />
           <Route path='/account' element={<AccountSettings />} />
           <Route path='/products' element={<ProductManagement />} />
           <Route path='/batch/:batchId' element={<BatchDetail />} />

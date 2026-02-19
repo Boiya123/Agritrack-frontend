@@ -1,10 +1,18 @@
 import React, { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './PoultryDisplay.css'
 import PoultryItem from '../PoultryItem/PoultryItem';
 import { StoreContext } from '../../context/StoreContext';
+
 const PoultryDisplay = ({ category }) => {
+    const navigate = useNavigate();
     const { getAllProducts } = useContext(StoreContext);
     const allProducts = getAllProducts().slice(0, 20); // Only show first 20 products
+    
+    const handleProductClick = (productId, productName) => {
+      navigate(`/product-batches/${productId}?name=${productName}`);
+    };
+
   return (
     <div className='poultry-display' id ='poultry-display'>
         <h2>Our Poultry Products</h2>
@@ -12,7 +20,15 @@ const PoultryDisplay = ({ category }) => {
             {allProducts.map ((item, index) =>{
                 const itemCategory = item.category || 'All';
                 if(category === 'All' || itemCategory === category){
-                    return <PoultryItem key={item._id ?? index} id={item._id} name={item.name} price={item.price} description={item.description} image={item.image} />
+                    return <PoultryItem 
+                      key={item._id ?? index} 
+                      id={item._id} 
+                      name={item.name} 
+                      price={item.price} 
+                      description={item.description} 
+                      image={item.image}
+                      onClick={handleProductClick}
+                    />
                 }
             })}
         </div>

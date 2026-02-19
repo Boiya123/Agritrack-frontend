@@ -3,12 +3,18 @@
     margin: auto;
     border-radius: 15px;
     box-shadow: 0px 0ox 10px #00000015;
-    transition: 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     animation: fadeIn 1s;
     overflow: visible;
     display: flex;
     flex-direction: column;
     height: 100%;
+}
+
+.food-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(107, 165, 55, 0.3);
 }
 
 .food-item-img-container {
