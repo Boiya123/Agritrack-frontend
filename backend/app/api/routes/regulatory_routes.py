@@ -45,6 +45,25 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/regulatory", tags=["regulatory"])
 
 
+@router.get("/records", response_model=list[RegulatoryRecordResponse])
+async def list_regulatory_records(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100,
+    status_filter: str = None
+):
+    """Get all regulatory records (for regulators to see pending approvals)"""
+    query = db.query(RegulatoryRecord).order_by(RegulatoryRecord.created_at.desc())
+    
+    # Filter by status if provided
+    if status_filter:
+        query = query.filter(RegulatoryRecord.status == status_filter)
+    
+    records = query.offset(skip).limit(limit).all()
+    return records
+
+
 @router.post("/records", response_model=RegulatoryRecordResponse, status_code=status.HTTP_201_CREATED)
 async def create_regulatory_record(
     record_data: RegulatoryRecordCreate,
@@ -245,7 +264,7 @@ async def approve_regulatory_record(
 @router.post("/records/{record_id}/reject")
 async def reject_regulatory_record(
     record_id: UUID,
-    reason: str,
+    rejection_reason: str = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -264,7 +283,7 @@ async def reject_regulatory_record(
         )
 
     record.status = "rejected"
-    record.rejection_reason = reason
+    record.rejection_reason = rejection_reason or "No reason provided"
 
     db.commit()
     db.refresh(record)
@@ -275,7 +294,7 @@ async def reject_regulatory_record(
         await emit_regulatory_violation(
             farmer_id=batch.farmer_id,
             violation_type=f"{record.record_type}_REJECTED",
-            description=reason,
+            description=record.rejection_reason,
             regulator_id=current_user.id
         )
 
@@ -283,7 +302,7 @@ async def reject_regulatory_record(
         "id": record.id,
         "record_type": record.record_type,
         "status": record.status,
-        "rejection_reason": reason,
+        "rejection_reason": record.rejection_reason,
         "message": f"{record.record_type} rejected"
     }
 

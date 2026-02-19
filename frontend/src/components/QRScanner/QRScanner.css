@@ -1,0 +1,252 @@
+.qr-scanner-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.qr-scanner-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.qr-scanner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.qr-scanner-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.qr-error {
+  padding: 30px 20px;
+  background: #fee;
+  color: #c33;
+  border-radius: 8px;
+  margin: 20px;
+  text-align: center;
+}
+
+.qr-error p {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+}
+
+.retry-btn {
+  background: #c33;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.retry-btn:hover {
+  background: #a22;
+  transform: translateY(-2px);
+}
+
+.qr-scanner-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #000;
+  overflow: hidden;
+}
+
+.qr-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hidden {
+  display: none;
+}
+
+.qr-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-frame {
+  width: 250px;
+  height: 250px;
+  border: 3px solid #667eea;
+  border-radius: 12px;
+  box-shadow: 
+    0 0 0 2000px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 2px #667eea;
+  position: relative;
+}
+
+.qr-frame::before,
+.qr-frame::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #667eea;
+}
+
+.qr-frame::before {
+  top: -15px;
+  left: -15px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.qr-frame::after {
+  bottom: -15px;
+  right: -15px;
+  border-left: none;
+  border-top: none;
+}
+
+.qr-controls {
+  display: flex;
+  gap: 12px;
+  padding: 20px;
+  background: #f8f9fa;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.capture-btn,
+.manual-btn {
+  flex: 1;
+  min-width: 150px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.capture-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.capture-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.capture-btn:active {
+  transform: translateY(0);
+}
+
+.manual-btn {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.manual-btn:hover {
+  background: #f0f4ff;
+  transform: translateY(-2px);
+}
+
+.qr-result {
+  padding: 20px;
+  background: #f0f8ff;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.result-label {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.result-code {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #667eea;
+  word-break: break-all;
+  font-family: 'Courier New', monospace;
+}
+
+@media (max-width: 480px) {
+  .qr-scanner-content {
+    width: 95%;
+    border-radius: 8px;
+  }
+
+  .qr-frame {
+    width: 180px;
+    height: 180px;
+  }
+
+  .capture-btn,
+  .manual-btn {
+    min-width: 120px;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}

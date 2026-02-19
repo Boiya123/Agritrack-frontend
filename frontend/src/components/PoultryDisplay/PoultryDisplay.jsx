@@ -4,7 +4,7 @@ import PoultryItem from '../PoultryItem/PoultryItem';
 import { StoreContext } from '../../context/StoreContext';
 const PoultryDisplay = ({ category }) => {
     const { getAllProducts } = useContext(StoreContext);
-    const allProducts = getAllProducts();
+    const allProducts = getAllProducts().slice(0, 20); // Only show first 20 products
   return (
     <div className='poultry-display' id ='poultry-display'>
         <h2>Our Poultry Products</h2>

@@ -42,6 +42,9 @@ const NavBar = ({ setShowLogin }) => {
             <Link to='/' style={{textDecoration: 'none'}}><li onClick={() => {setMenu("contact_us"); handleSectionClick("footer");}} className={menu === "contact_us" ? "active" : ""}>Contact Us</li></Link>
             <Link to='/ops' style={{textDecoration: 'none'}}><li onClick={() => setMenu("ops")} className={menu === "ops" ? "active" : ""}>Operations</li></Link>
             <Link to='/dashboard' style={{textDecoration: 'none'}}><li onClick={() => setMenu("dashboard")} className={menu === "dashboard" ? "active" : ""}>Dashboard</li></Link>
+            {currentUser?.role === 'regulator' && (
+                <Link to='/regulatory' style={{textDecoration: 'none'}}><li onClick={() => setMenu("regulatory")} className={menu === "regulatory" ? "active" : ""}>Approvals</li></Link>
+            )}
         </ul>
         <div className='navbar-right'>
             <img src={assets.search_icon} alt="Search" />
