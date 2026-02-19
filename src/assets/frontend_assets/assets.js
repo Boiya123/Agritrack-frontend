@@ -1,48 +1,36 @@
 import basket_icon from './basket_icon.png'
 import logo from './logo.png'
-import header_img from './header_img.png'
+import header_img from './header_farm.png'
 import search_icon from './search_icon.png'
 import menu_1 from './menu_1.png'
 import menu_2 from './menu_2.png'
-import menu_3 from './menu_3.png'
-import menu_4 from './menu_4.png'
-import menu_5 from './menu_5.png'
-import menu_6 from './menu_6.png'
-import menu_7 from './menu_7.png'
-import menu_8 from './menu_8.png'
+import menu_3 from './native_eggs.png'
+import menu_4 from './seafood.png'
+import menu_5 from './native_lamb.png'
+import menu_6 from './white_pig.png'
+import menu_7 from './native_turkey.png'
+import menu_8 from './nattive_rabbits.png'
 
 import food_1 from './Darag.png'
 import food_2 from './Leg Horn Chicken.png'
 import food_3 from './eggs.webp'
 import food_4 from './DekalbWhite.png'
 import food_5 from './ISABrown.jpg'
-import food_6 from './food_6.png'
-import food_7 from './food_7.png'
-import food_8 from './food_8.png'
-import food_9 from './food_9.png'
-import food_10 from './food_10.png'
-import food_11 from './food_11.png'
-import food_12 from './food_12.png'
-import food_13 from './food_13.png'
-import food_14 from './food_14.png'
-import food_15 from './food_15.png'
-import food_16 from './food_16.png'
-import food_17 from './food_17.png'
-import food_18 from './food_18.png'
-import food_19 from './food_19.png'
-import food_20 from './food_20.png'
-import food_21 from './food_21.png'
-import food_22 from './food_22.png'
-import food_23 from './food_23.png'
-import food_24 from './food_24.png'
-import food_25 from './food_25.png'
-import food_26 from './food_26.png'
-import food_27 from './food_27.png'
-import food_28 from './food_28.png'
-import food_29 from './food_29.png'
-import food_30 from './food_30.png'
-import food_31 from './food_31.png'
-import food_32 from './food_32.png'
+import food_6 from './native_black_pig.png'
+import food_7 from './native_brown_chicken.png'
+import food_8 from './native_cows.png'
+import food_9 from './native_eggs.png'
+import food_10 from './native_lamb.png'
+import food_11 from './white_pig.png'
+import food_12 from './nattive_rabbits.png'
+import food_13 from './native_turkey.png'
+import food_14 from './native_goat.png'
+import food_15 from './bangus.png'
+import food_16 from './tuna.png'
+import food_17 from './salmon.png'
+import food_18 from './shrimp.png'
+import food_19 from './tilapia.png'
+import food_20 from './crab.png'
 
 import add_icon_white from './add_icon_white.png'
 import add_icon_green from './add_icon_green.png'
@@ -83,268 +71,175 @@ export const assets = {
 }
 
 export const menu_list = [
-    {
-        menu_name: "Chicken",
-        menu_image: menu_1
-    },
-    {
-        menu_name: "Cow",
-        menu_image: menu_2
-    },
-    {
-        menu_name: "Deserts",
-        menu_image: menu_3
-    },
-    {
-        menu_name: "Sandwich",
-        menu_image: menu_4
-    },
-    {
-        menu_name: "Cake",
-        menu_image: menu_5
-    },
-    {
-        menu_name: "Pure Veg",
-        menu_image: menu_6
-    },
-    {
-        menu_name: "Pasta",
-        menu_image: menu_7
-    },
-    {
-        menu_name: "Noodles",
-        menu_image: menu_8
-    }]
+    { menu_name: "Chicken", menu_image: menu_1 },
+    { menu_name: "Cattle", menu_image: menu_2 },
+    { menu_name: "Eggs", menu_image: menu_3 },
+    { menu_name: "Seafood", menu_image: menu_4 },
+    { menu_name: "Lamb & Goat", menu_image: menu_5 },
+    { menu_name: "Pork", menu_image: menu_6 },
+    { menu_name: "Turkey", menu_image: menu_7 },
+    { menu_name: "Rabbit", menu_image: menu_8 }
+]
 
 export const food_list = [
     {
         _id: "1",
-        name: "Darag",
+        name: "Darag Chicken",
         image: food_1,
         price: 12,
-        description: "Darag is a premium poultry breed known for its excellent meat quality and fast growth. Rich in protein and essential amino acids, it provides nutritious and healthy meals for your family.",
+        description: "Native Darag chicken known for its rich flavor, firm texture, and premium quality meat.",
         category: "Chicken"
     },
     {
         _id: "2",
-        name: "Leg Horn",
+        name: "Leghorn Chicken",
         image: food_2,
         price: 18,
-        description: "Leg Horn chickens are a popular breed prized for their consistent egg production and lean meat. Known for being hardy and adaptable, they provide excellent quality poultry products for your kitchen.",
+        description: "Hardy chicken breed valued for its lean meat and high egg productivity.",
         category: "Chicken"
-    }, {
+    },
+    {
         _id: "3",
-        name: "Eggs",
+        name: "Fresh Farm Eggs",
         image: food_3,
         price: 16,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Chicken"
-    }, {
+        description: "Nutritious farm-fresh eggs packed with protein and essential vitamins.",
+        category: "Eggs"
+    },
+    {
         _id: "4",
         name: "Dekalb White",
         image: food_4,
         price: 24,
-        description: "Dekalb White chickens are a superior hybrid breed renowned for excellent feed conversion and consistent performance. These birds produce high-quality meat and are ideal for both commercial and home poultry operations.",
+        description: "Hybrid layer breed known for consistent egg production and feed efficiency.",
         category: "Chicken"
-    }, {
+    },
+    {
         _id: "5",
         name: "ISA Brown",
         image: food_5,
         price: 14,
-        description: "ISA Brown chickens are a highly productive and adaptable breed known for outstanding performance in various climates. These birds offer excellent meat quality and reliability, making them a preferred choice for poultry farmers.",
+        description: "High-performing brown layer chicken adaptable to various climates.",
         category: "Chicken"
-    }, {
+    },
+    {
         _id: "6",
-        name: "Peri Peri Rolls",
+        name: "Native Black Pig",
         image: food_6,
-        price: 12,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Cow"
-    }, {
+        price: 22,
+        description: "Premium native pork known for its rich taste and natural marbling.",
+        category: "Pork"
+    },
+    {
         _id: "7",
-        name: "Chicken Rolls",
+        name: "Native Brown Chicken",
         image: food_7,
         price: 20,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Cow"
-    }, {
+        description: "Locally raised brown chicken with flavorful and tender meat.",
+        category: "Chicken"
+    },
+    {
         _id: "8",
-        name: "Veg Rolls",
+        name: "Native Cow",
         image: food_8,
-        price: 15,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Cow"
-    }, {
+        price: 30,
+        description: "Grass-fed native cattle producing high-quality and lean beef.",
+        category: "Cattle"
+    },
+    {
         _id: "9",
-        name: "Ripple Ice Cream",
+        name: "Native Eggs",
         image: food_9,
-        price: 14,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Deserts"
-    }, {
+        price: 15,
+        description: "Organic native eggs with richer yolk and enhanced flavor.",
+        category: "Eggs"
+    },
+    {
         _id: "10",
-        name: "Fruit Ice Cream",
+        name: "Native Lamb",
         image: food_10,
-        price: 22,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Deserts"
-    }, {
+        price: 28,
+        description: "Tender and naturally raised lamb perfect for premium dishes.",
+        category: "Lamb & Goat"
+    },
+    {
         _id: "11",
-        name: "Jar Ice Cream",
+        name: "White Pig",
         image: food_11,
-        price: 10,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Deserts"
-    }, {
+        price: 25,
+        description: "High-quality pork from white pig breeds ideal for various recipes.",
+        category: "Pork"
+    },
+    {
         _id: "12",
-        name: "Vanilla Ice Cream",
+        name: "Native Rabbit",
         image: food_12,
-        price: 12,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Deserts"
+        price: 19,
+        description: "Lean and healthy rabbit meat known for its high protein content.",
+        category: "Rabbit"
     },
     {
         _id: "13",
-        name: "Chicken Sandwich",
+        name: "Native Turkey",
         image: food_13,
-        price: 12,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Sandwich"
+        price: 27,
+        description: "Locally raised turkey with tender and flavorful meat.",
+        category: "Turkey"
     },
     {
         _id: "14",
-        name: "Vegan Sandwich",
+        name: "Native Goat",
         image: food_14,
-        price: 18,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Sandwich"
-    }, {
+        price: 26,
+        description: "Fresh goat meat ideal for traditional and savory dishes.",
+        category: "Lamb & Goat"
+    },
+    {
         _id: "15",
-        name: "Grilled Sandwich",
+        name: "Bangus (Milkfish)",
         image: food_15,
-        price: 16,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Sandwich"
-    }, {
+        price: 12,
+        description: "Fresh milkfish, a Filipino favorite known for its mild flavor.",
+        category: "Seafood"
+    },
+    {
         _id: "16",
-        name: "Bread Sandwich",
+        name: "Tuna",
         image: food_16,
-        price: 24,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Sandwich"
-    }, {
-        _id: "17",
-        name: "Cup Cake",
-        image: food_17,
-        price: 14,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Cake"
-    }, {
-        _id: "18",
-        name: "Vegan Cake",
-        image: food_18,
-        price: 12,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Cake"
-    }, {
-        _id: "19",
-        name: "Butterscotch Cake",
-        image: food_19,
-        price: 20,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Cake"
-    }, {
-        _id: "20",
-        name: "Sliced Cake",
-        image: food_20,
-        price: 15,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Cake"
-    }, {
-        _id: "21",
-        name: "Garlic Mushroom ",
-        image: food_21,
-        price: 14,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Pure Veg"
-    }, {
-        _id: "22",
-        name: "Fried Cauliflower",
-        image: food_22,
-        price: 22,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Pure Veg"
-    }, {
-        _id: "23",
-        name: "Mix Veg Pulao",
-        image: food_23,
-        price: 10,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Pure Veg"
-    }, {
-        _id: "24",
-        name: "Rice Zucchini",
-        image: food_24,
-        price: 12,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Pure Veg"
-    },
-    {
-        _id: "25",
-        name: "Cheese Pasta",
-        image: food_25,
-        price: 12,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Pasta"
-    },
-    {
-        _id: "26",
-        name: "Tomato Pasta",
-        image: food_26,
         price: 18,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Pasta"
-    }, {
-        _id: "27",
-        name: "Creamy Pasta",
-        image: food_27,
-        price: 16,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Pasta"
-    }, {
-        _id: "28",
-        name: "Chicken Pasta",
-        image: food_28,
+        description: "Fresh tuna rich in omega-3 fatty acids and lean protein.",
+        category: "Seafood"
+    },
+    {
+        _id: "17",
+        name: "Salmon",
+        image: food_17,
         price: 24,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Pasta"
-    }, {
-        _id: "29",
-        name: "Buttter Noodles",
-        image: food_29,
-        price: 14,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Noodles"
-    }, {
-        _id: "30",
-        name: "Veg Noodles",
-        image: food_30,
-        price: 12,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Noodles"
-    }, {
-        _id: "31",
-        name: "Somen Noodles",
-        image: food_31,
+        description: "Premium salmon packed with healthy fats and nutrients.",
+        category: "Seafood"
+    },
+    {
+        _id: "18",
+        name: "Shrimp",
+        image: food_18,
         price: 20,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Noodles"
-    }, {
-        _id: "32",
-        name: "Cooked Noodles",
-        image: food_32,
+        description: "Fresh shrimp perfect for grilling, frying, or soups.",
+        category: "Seafood"
+    },
+    {
+        _id: "19",
+        name: "Tilapia",
+        image: food_19,
         price: 15,
-        description: "Food provides essential nutrients for overall health and well-being",
-        category: "Noodles"
+        description: "Freshwater fish known for its mild taste and versatility.",
+        category: "Seafood"
+    },
+    {
+        _id: "20",
+        name: "Crab",
+        image: food_20,
+        price: 22,
+        description: "Fresh crab with sweet and succulent meat.",
+        category: "Seafood"
     }
 ]
