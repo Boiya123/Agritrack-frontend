@@ -13,7 +13,21 @@ class UserRegister(BaseModel):
     def normalize_role(cls, v):
         return v.upper()
 
+    @field_validator('password')
+    @classmethod
+    def validate_password_length(cls, v):
+        if len(v.encode('utf-8')) > 72:
+            raise ValueError('Password must be 72 bytes or fewer.')
+        return v
+
 
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+    @field_validator('password')
+    @classmethod
+    def validate_password_length(cls, v):
+        if len(v.encode('utf-8')) > 72:
+            raise ValueError('Password must be 72 bytes or fewer.')
+        return v
