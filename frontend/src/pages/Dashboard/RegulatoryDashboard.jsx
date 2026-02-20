@@ -139,55 +139,48 @@ const RegulatoryDashboard = () => {
         </div>
 
         {pendingRecords.length === 0 ? (
-          <div className="empty-state">All records have been reviewed. No pending approvals.</div>
+          <div className="empty-state" style={{textAlign:'center',padding:'32px 0',color:'#5b6a5d',fontSize:'16px'}}>No pending approvals.</div>
         ) : (
-          <div className="records-grid">
+          <div style={{maxWidth:'900px',margin:'0 auto'}}>
             {pendingRecords.map(record => (
-              <div key={record.id} className="record-card">
-                <div className="record-header">
-                  <h3>{record.record_type.replace('_', ' ').toUpperCase()}</h3>
-                  <span className="status-badge pending">PENDING</span>
-                </div>
-
-                <div className="record-details">
-                  <p><strong>Batch ID:</strong> {record.batch_number}</p>
-                  <p><strong>Record Type:</strong> {record.record_type}</p>
-                  <p><strong>Details:</strong> {record.details || 'No additional details'}</p>
-                </div>
-
-                <div className="record-actions">
-                  <button
-                    className="btn btn-approve"
-                    onClick={() => handleApprove(record.id)}
-                    disabled={actionLoading === record.id}
-                  >
-                    {actionLoading === record.id ? 'Processing...' : 'Approve'}
-                  </button>
-
-                  <button
-                    className="btn btn-decline"
-                    onClick={() => setShowDeclineForm(showDeclineForm === record.id ? null : record.id)}
-                    disabled={actionLoading === record.id}
-                  >
-                    {showDeclineForm === record.id ? 'Cancel' : 'Decline'}
-                  </button>
-                </div>
-
+              <div key={record.id} style={{display:'flex',alignItems:'center',gap:'16px',padding:'8px 0',borderBottom:'1px solid #e5e7eb',background:'none'}}>
+                <span className="status-badge pending" style={{minWidth:'60px'}}>Pending</span>
+                <span style={{fontWeight:600,color:'#059669',fontSize:'13px'}}>{record.batch_number}</span>
+                <span style={{color:'#5b6a5d',fontSize:'13px'}}>{record.record_type.replace('_',' ')}</span>
+                {record.details && <span style={{color:'#7a8a7a',fontSize:'13px'}}>{record.details}</span>}
+                <button
+                  className="btn btn-approve"
+                  style={{minWidth:70,fontWeight:500,fontSize:'12px',marginLeft:'auto'}}
+                  onClick={() => handleApprove(record.id)}
+                  disabled={actionLoading === record.id}
+                >
+                  {actionLoading === record.id ? '...' : 'Approve'}
+                </button>
+                <button
+                  className="btn btn-decline"
+                  style={{minWidth:70,fontWeight:500,fontSize:'12px'}}
+                  onClick={() => setShowDeclineForm(showDeclineForm === record.id ? null : record.id)}
+                  disabled={actionLoading === record.id}
+                >
+                  {showDeclineForm === record.id ? 'Cancel' : 'Decline'}
+                </button>
                 {showDeclineForm === record.id && (
-                  <div className="decline-form">
+                  <div style={{display:'flex',flexDirection:'column',gap:'6px',marginLeft:'16px',width:'220px'}}>
                     <textarea
-                      placeholder="Enter rejection reason (required)..."
+                      placeholder="Rejection reason (required)"
                       value={declineReason}
                       onChange={(e) => setDeclineReason(e.target.value)}
                       className="decline-textarea"
                       autoFocus
+                      style={{fontSize:'12px',padding:'8px'}}
                     />
                     <button
                       className="btn btn-reject-confirm"
+                      style={{fontWeight:500,fontSize:'12px'}}
                       onClick={() => handleReject(record.id)}
                       disabled={actionLoading === record.id || !declineReason.trim()}
                     >
-                      {actionLoading === record.id ? 'Submitting...' : 'Confirm Rejection'}
+                      {actionLoading === record.id ? '...' : 'Confirm'}
                     </button>
                   </div>
                 )}
@@ -205,7 +198,7 @@ const RegulatoryDashboard = () => {
         </div>
 
         {approvedRecords.length === 0 ? (
-          <div className="empty-state">No approved records yet. Approve pending records to see them here.</div>
+          <div className="empty-state" style={{textAlign:'center',padding:'32px 0',color:'#5b6a5d',fontSize:'16px'}}>No approved records yet. Approve pending records to see them here.</div>
         ) : (
           <div className="records-grid">
             {approvedRecords.map(record => (
@@ -234,7 +227,7 @@ const RegulatoryDashboard = () => {
         </div>
 
         {rejectedRecords.length === 0 ? (
-          <div className="empty-state">No rejected records. Declined batches will appear here.</div>
+          <div className="empty-state" style={{textAlign:'center',padding:'32px 0',color:'#5b6a5d',fontSize:'16px'}}>No rejected records. Declined batches will appear here.</div>
         ) : (
           <div className="records-grid">
             {rejectedRecords.map(record => (
